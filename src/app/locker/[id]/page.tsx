@@ -10,6 +10,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   const [name, setName] = useState<string>("");
   const [data, setData] = useState<string[]>([]);
   const [deleteLocker, setDeleteLocker] = useState<boolean>(false);
+  const [exists, setExists] = useState<boolean>(false);
 
   useEffect(() => {
     const loadId = async () => {
@@ -17,7 +18,18 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       setId(resolvedId);
     };
 
+    const get_locker = async () => {
+      const response = await api.post("http://localhost:5000/api/get", {
+        name: id,
+      });
+      if (response.success) {
+        if ((response.data as { status: number }).status === 1) {
+          setExists(true);
+        }
+      }
+    };
     loadId();
+    get_locker();
   }, [props.params]);
 
   const check_key = async () => {
@@ -57,6 +69,21 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     }
   };
 
+  if (!exists) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <h1 className="text-3xl font-bold">Locker not found</h1>
+          <button
+            className="bg-blue-500 text-white p-2 rounded-lg"
+            onClick={() => redirect("/")}
+          >
+            Go back
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (!auth) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
