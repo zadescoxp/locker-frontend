@@ -1,6 +1,7 @@
 "use client";
 import api from "@/libs/api";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
@@ -33,10 +34,10 @@ export default function Home() {
       } else if (data.message) {
         setMessage(data.message);
       } else {
-        setMessage("Something went wrong");
+        setError("Something went wrong");
       }
     } else {
-      console.log(response?.error);
+      console.error(response?.error);
     }
   };
 
@@ -45,6 +46,9 @@ export default function Home() {
     setLockerName(lockerName.replaceAll(" ", ""));
     if (lockerName) {
       post({ url: "http://localhost:5000/api/check", cred: false });
+      if (error) {
+        redirect(`/locker/${lockerName}`);
+      }
     }
   };
 
@@ -52,6 +56,7 @@ export default function Home() {
   const createLocker = async () => {
     if (passkey.length >= 5) {
       post({ url: "http://localhost:5000/api/locker", cred: true });
+      redirect(`/locker/${lockerName}`);
     }
   };
 
@@ -74,6 +79,7 @@ export default function Home() {
             className="py-4 px-4 bg-[#222222] outline-none text-md w-[90%]"
             value={lockerName}
             onChange={(e) => setLockerName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && checkLocker()}
           />
           <button
             className="py-4 px-4 bg-white text-black outline-none hover:bg-[#e1e1e1] transition-all w-[10%]"
@@ -93,7 +99,8 @@ export default function Home() {
         <p>
           Made by{" "}
           <Link
-            href={"zadescoxp.com"}
+            href={"https://zadescoxp.com"}
+            target="_blank"
             className="text-blue-500 hover:text-blue-700 transition-all"
           >
             Zade Scoxp
@@ -119,6 +126,7 @@ export default function Home() {
               className="py-4 px-4 bg-[#222222] outline-none text-md w-[90%]"
               value={passkey}
               onChange={(e) => setPasskey(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && createLocker()}
             />
             <p className="text-red-500 text-sm">
               {passkey.length < 5
