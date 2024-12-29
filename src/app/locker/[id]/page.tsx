@@ -18,19 +18,24 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       setId(resolvedId);
     };
 
-    const get_locker = async () => {
-      const response = await api.post("http://localhost:5000/api/get", {
-        name: id,
-      });
-      if (response.success) {
-        if ((response.data as { status: number }).status === 1) {
-          setExists(true);
-        }
-      }
-    };
     loadId();
-    get_locker();
   }, [props.params]);
+
+  useEffect(() => {
+    get_locker();
+  }, [id]);
+
+  const get_locker = async () => {
+    const response = await api.post(`http://localhost:5000/api/get/`, {
+      name: id,
+    });
+    console.log(response.data);
+    if (response.success) {
+      if ((response.data as { status: number }).status === 1) {
+        setExists(true);
+      }
+    }
+  };
 
   const check_key = async () => {
     const response = await api.post(`http://localhost:5000/api/check_key`, {
