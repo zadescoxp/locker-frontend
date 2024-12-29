@@ -13,7 +13,8 @@
     "next": "15.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sonner": "^1.7.1"
+    "sonner": "^1.7.1",
+    "tanmayo7lock": "^1.0.18"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
