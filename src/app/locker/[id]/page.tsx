@@ -11,6 +11,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   const [data, setData] = useState<string[]>([]);
   const [deleteLocker, setDeleteLocker] = useState<boolean>(false);
   const [exists, setExists] = useState<boolean>(false);
+  const [image, setImage] = useState<FormData>(new FormData());
 
   useEffect(() => {
     const loadId = async () => {
@@ -128,6 +129,23 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     );
   };
 
+  const addFiles = async (e) => {
+    console.log("This is working");
+    console.log(e.target.files[0]);
+    const formData = new FormData();
+    formData.append("file", e.target.files[0], e.target.files[0].name);
+    setImage(formData);
+  };
+
+  const uploadFile = async () => {
+    const response = await api.post(`http://localhost:5000/api/upload/`, image);
+    if (response.success) {
+      console.log(response.data);
+    } else {
+      console.log(response.error);
+    }
+  };
+
   return (
     <div>
       <p>Locker {name}</p>
@@ -139,7 +157,13 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       <button className="" onClick={() => setDeleteLocker(!deleteLocker)}>
         delete
       </button>
-
+      <input
+        type="file"
+        onChange={(e) => {
+          addFiles(e);
+        }}
+      />
+      <button onClick={uploadFile}>Upload</button>
       {deleteLocker && <DeleteLocker />}
     </div>
   );
