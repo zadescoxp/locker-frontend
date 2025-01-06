@@ -26,9 +26,18 @@ export default function Home() {
       });
     }
     if (response?.success) {
-      console.log(response);
+      // console.log(response);
       console.log(response.data);
-      const data = response.data as { error?: string; message?: string };
+      const data = response.data as {
+        error?: string;
+        message?: string;
+        status?: number;
+      };
+
+      if (data.status === 2) {
+        redirect(`/locker/${lockerName}`);
+      }
+
       if (data.error) {
         setError(data.error);
       } else if (data.message) {
@@ -37,7 +46,7 @@ export default function Home() {
         setError("Something went wrong");
       }
     } else {
-      console.error(response?.error);
+      // console.log(response?.error);
     }
   };
 
@@ -46,9 +55,6 @@ export default function Home() {
     setLockerName(lockerName.replaceAll(" ", ""));
     if (lockerName) {
       post({ url: "http://localhost:5000/api/check", cred: false });
-      if (error) {
-        redirect(`/locker/${lockerName}`);
-      }
     }
   };
 
@@ -78,7 +84,9 @@ export default function Home() {
             placeholder="Enter a name for your locker"
             className="py-4 px-4 bg-[#222222] outline-none text-md w-[90%]"
             value={lockerName}
-            onChange={(e) => setLockerName(e.target.value)}
+            onChange={(e) => {
+              setLockerName(e.target.value);
+            }}
             onKeyDown={(e) => e.key === "Enter" && checkLocker()}
           />
           <button
@@ -90,9 +98,6 @@ export default function Home() {
         </span>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         {message && <p className="text-green-500 text-sm">{message}</p>}
-        <small className="text-[#bdbdbd] text-sm">
-          *All the lockers are destroyed after 24hrs
-        </small>
       </div>
 
       <div className="flex items-center justify-center gap-20 fixed bottom-0 left-0 p-10 w-full">
@@ -121,7 +126,7 @@ export default function Home() {
           <div className="bg-[#111111] w-1/2 py-14 rounded-lg flex flex-col gap-5 items-center justify-center">
             <h1 className="text-5xl font-bold">PASSKEY</h1>
             <input
-              type="text"
+              type="password"
               placeholder="Enter your passkey"
               className="py-4 px-4 bg-[#222222] outline-none text-md w-[90%]"
               value={passkey}
