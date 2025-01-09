@@ -1,5 +1,6 @@
 "use client";
 import api from "@/libs/api";
+import { encryptObjectValues } from "@/libs/utils";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState } from "react";
@@ -12,18 +13,17 @@ export default function Home() {
 
   // POST request to the API
   const post = async ({ url, cred }: { url: string; cred: boolean }) => {
+    const payload = {
+      name: lockerName,
+      passkey: passkey,
+    };
     setError(undefined);
     setMessage(undefined);
     let response = null;
     if (cred) {
-      response = await api.post(url, {
-        name: lockerName,
-        passkey: passkey,
-      });
+      response = await api.post(url, encryptObjectValues(payload));
     } else {
-      response = await api.post(url, {
-        name: lockerName,
-      });
+      response = await api.post(url, encryptObjectValues({ name: lockerName }));
     }
     if (response?.success) {
       // console.log(response);
