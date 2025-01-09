@@ -1,7 +1,10 @@
 "use client";
 import api from "@/libs/api";
+import { encryptObjectValues } from "@/libs/utils";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
+import { encrypt } from "tanmayo7lock";
 
 export default function Locker(props: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState<string>("");
@@ -23,14 +26,15 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   }, [props.params]);
 
   useEffect(() => {
+    if (!id) return;
     get_locker();
   }, [id]);
 
   const get_locker = async () => {
-    const response = await api.post(`http://localhost:5000/api/get/`, {
-      name: id,
-    });
-    console.log(response.data);
+    const response = await api.post(
+      `http://localhost:5000/api/get/`,
+      encryptObjectValues({ name: id })
+    );
     if (response.success) {
       if ((response.data as { status: number }).status === 1) {
         setExists(true);
@@ -39,12 +43,15 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   };
 
   const check_key = async () => {
-    const response = await api.post(`http://localhost:5000/api/check_key`, {
+    const payload = {
       name: id,
       key: passkey,
-    });
+    };
+    const response = await api.post(
+      `http://localhost:5000/api/check_key`,
+      encryptObjectValues(payload)
+    );
     if (response.success) {
-      console.log(response.data);
       const responseData = response.data as {
         status: number;
         name: string;
@@ -61,13 +68,16 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   };
 
   const delete_locker = async () => {
-    const response = await api.post("http://localhost:5000/api/delete", {
+    const payload = {
       name: id,
       passkey: passkey,
-    });
+    };
+    const response = await api.post(
+      "http://localhost:5000/api/delete",
+      encryptObjectValues(payload)
+    );
     if (response.success) {
       if ((response.data as { status: number }).status === 1) {
-        console.log("deleted");
         redirect("/");
       } else {
         console.log(response.error);
@@ -129,18 +139,37 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     );
   };
 
+  const deleteFile = async (fileName: string) => {
+    const payload = {
+      name: id,
+      passkey: passkey,
+      fileName: fileName,
+    };
+    const response = await api.post(
+      "http://localhost:5000/api/delete_file",
+      encryptObjectValues(payload)
+    );
+    if (response.success) {
+      if ((response.data as { status: number }).status === 1) {
+        check_key();
+      } else {
+        console.log(response.error);
+      }
+    }
+  };
+
   const addFiles = async (e) => {
-    console.log("This is working");
-    console.log(e.target.files[0]);
     const formData = new FormData();
     formData.append("file", e.target.files[0], e.target.files[0].name);
+    formData.append("name", encrypt(id));
+    formData.append("passkey", encrypt(passkey));
     setImage(formData);
   };
 
   const uploadFile = async () => {
     const response = await api.post(`http://localhost:5000/api/upload/`, image);
     if (response.success) {
-      console.log(response.data);
+      check_key();
     } else {
       console.log(response.error);
     }
@@ -149,11 +178,15 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   return (
     <div>
       <p>Locker {name}</p>
-      <ul>
-        {data.map((d, i) => (
-          <li key={i}>{d}</li>
+      {data.length > 0 &&
+        data.map((item, index) => (
+          <div key={index}>
+            <Link href={item?.url} download={item?.url} target="_blank">
+              {item?.fileName}
+            </Link>
+            <button onClick={() => deleteFile(item?.fileName)}>Delete</button>
+          </div>
         ))}
-      </ul>
       <button className="" onClick={() => setDeleteLocker(!deleteLocker)}>
         delete
       </button>
