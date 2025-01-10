@@ -1,6 +1,7 @@
 "use client";
 import api from "@/libs/api";
 import { encryptObjectValues } from "@/libs/utils";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -88,10 +89,10 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   if (!exists) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold">Locker not found</h1>
+        <div className="flex flex-col items-center gap-5">
+          <h1 className="text-3xl">Locker not found</h1>
           <button
-            className="bg-blue-500 text-white p-2 rounded-lg"
+            className="bg-black text-white font-light py-4 px-8 rounded-lg"
             onClick={() => redirect("/")}
           >
             Go back
@@ -103,17 +104,18 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   if (!auth) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold">Enter passkey</h1>
+        <div className="flex flex-col items-center bg-lightgrey rounded-lg p-10 gap-5 w-1/3">
+          <h1 className="text-3xl">Enter passkey</h1>
           <input
             type="password"
-            className="py-4 px-4 bg-[#222222]"
+            className="py-4 px-4 bg-white rounded-lg outline-none w-full font-light"
+            placeholder="Enter your passkey"
             value={passkey}
             onChange={(e) => setPasskey(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && check_key()}
           />
           <button
-            className="bg-blue-500 text-white p-2 rounded-lg"
+            className="bg-black text-white font-light py-4 px-8 rounded-lg w-full"
             onClick={check_key}
           >
             Submit
@@ -125,16 +127,18 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
 
   const DeleteLocker = () => {
     return (
-      <div className="">
-        <p>Sure you want to delete it</p>
-        <span>
-          <button className="" onClick={delete_locker}>
-            Delete
-          </button>
-          <button className="" onClick={() => setDeleteLocker(!deleteLocker)}>
-            Cancel
-          </button>
-        </span>
+      <div className="w-screen h-screen bg-black bg-opacity-50 fixed top-0 left-0 flex items-center justify-center">
+        <div className="bg-white p-10 rounded-lg flex flex-col gap-5">
+          <p className="text-xl">Sure you want to delete it ?</p>
+          <span className="flex gap-10 font-light">
+            <button className="text-red-500" onClick={delete_locker}>
+              Delete
+            </button>
+            <button className="" onClick={() => setDeleteLocker(!deleteLocker)}>
+              Cancel
+            </button>
+          </span>
+        </div>
       </div>
     );
   };
@@ -176,28 +180,88 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   };
 
   return (
-    <div>
-      <p>Locker {name}</p>
-      {data.length > 0 &&
-        data.map((item, index) => (
-          <div key={index}>
-            <Link href={item?.url} download={item?.url} target="_blank">
-              {item?.fileName}
-            </Link>
-            <button onClick={() => deleteFile(item?.fileName)}>Delete</button>
-          </div>
-        ))}
-      <button className="" onClick={() => setDeleteLocker(!deleteLocker)}>
-        delete
-      </button>
-      <input
-        type="file"
-        onChange={(e) => {
-          addFiles(e);
-        }}
-      />
-      <button onClick={uploadFile}>Upload</button>
-      {deleteLocker && <DeleteLocker />}
+    <div className="flex items-center justify-center flex-col gap-5">
+      <div className="flex flex-col items-center gap-5 w-1/2 mt-40">
+        <div className="flex items-center justify-between w-full">
+          <h1 className="text-3xl">{name}</h1>
+
+          <button
+            className="bg-red-500 text-white px-8 py-4 rounded-lg hover:bg-red-600 transition-all"
+            onClick={() => setDeleteLocker(!deleteLocker)}
+          >
+            Delete
+          </button>
+        </div>
+
+        <div className="flex flex-col items-start justify-center border-[1px] border-black rounded-lg w-full">
+          <p className="text-2xl p-5">Files</p>
+          {data.length > 0 &&
+            data.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between gap-2 border-t-[1px] p-4 w-full border-grey"
+              >
+                <Link
+                  href={item?.url}
+                  download={item?.url}
+                  target="_blank"
+                  className="flex gap-2"
+                >
+                  <Image
+                    src="/assets/file.svg"
+                    alt="file"
+                    width={15}
+                    height={15}
+                  />
+                  {item?.fileName}
+                </Link>
+                <span className="flex gap-2">
+                  <button onClick={() => deleteFile(item?.fileName)}>
+                    <Image
+                      src="/assets/delete.svg"
+                      alt="delete"
+                      width={15}
+                      height={15}
+                    />
+                  </button>
+                  <Link
+                    href={item?.url}
+                    download={item?.url}
+                    target="_blank"
+                    className="flex gap-2"
+                  >
+                    <Image
+                      src="/assets/download.svg"
+                      alt="file"
+                      width={15}
+                      height={15}
+                    />
+                  </Link>
+                </span>
+              </div>
+            ))}
+        </div>
+
+        {/* <label htmlFor="fileInput">Upload</label> */}
+        <span className="flex gap-5 items-center justify-center w-full">
+          <input
+            className="bg-lightgrey p-4 rounded-lg w-full"
+            id="fileInput"
+            type="file"
+            onChange={(e) => {
+              addFiles(e);
+            }}
+            accept="image/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+          />
+          <button
+            onClick={uploadFile}
+            className="bg-black text-white py-4 px-8 rounded-lg"
+          >
+            Upload
+          </button>
+        </span>
+        {deleteLocker && <DeleteLocker />}
+      </div>
     </div>
   );
 }
