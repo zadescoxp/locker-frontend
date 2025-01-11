@@ -142,7 +142,7 @@ export default function Home() {
           >
             {loading ? (
               <Image
-                className="h-5 w-auto animate-spin max-[602px]:h-3"
+                className="h-5 w-auto animate-spin max-[602px]:h-4"
                 src="/assets/loading-light.svg"
                 height={10}
                 width={10}
@@ -211,7 +211,7 @@ export default function Home() {
             >
               {loading ? (
                 <Image
-                  className="h-5 w-auto animate-spin max-[602px]:h-3"
+                  className="h-5 w-auto animate-spin max-[602px]:h-4"
                   src="/assets/loading-light.svg"
                   height={10}
                   width={10}

@@ -229,7 +229,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     <div className="flex items-center justify-center flex-col gap-5">
       <div className="flex flex-col items-center gap-5 w-full px-5 my-20">
         <div className="flex items-center justify-between w-full">
-          <h1 className="text-3xl">{name}</h1>
+          <h1 className="text-4xl">{name}</h1>
 
           <button
             className="bg-red-500 text-white px-8 py-4 rounded-lg hover:bg-red-600 transition-all"
@@ -256,7 +256,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
                     width={15}
                     height={15}
                   />
-                  <p className="text-wrap">
+                  <p className="">
                     {item?.fileName.length > 10
                       ? `${item?.fileName.substring(0, 10)}...`
                       : item?.fileName}
