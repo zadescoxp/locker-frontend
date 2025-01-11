@@ -14,9 +14,11 @@ export default function Home() {
   const [lockerName, setLockerName] = useState("");
   const [passkey, setPasskey] = useState("");
   const [confirmPasskey, setConfirmPasskey] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   // POST request to the API
   const post = async ({ url, cred }: { url: string; cred: boolean }) => {
+    setLoading(true);
     const payload = {
       name: lockerName,
       passkey: passkey,
@@ -30,8 +32,7 @@ export default function Home() {
       response = await api.post(url, encryptObjectValues({ name: lockerName }));
     }
     if (response?.success) {
-      // console.log(response);
-      console.log(response.data);
+      setLoading(false);
       const data = response.data as {
         error?: string;
         message?: string;
@@ -39,6 +40,7 @@ export default function Home() {
       };
 
       if (data.status === 2) {
+        setLoading(false);
         redirect(`/locker/${lockerName}`);
       }
 
@@ -65,11 +67,13 @@ export default function Home() {
 
   // create a new locker
   const createLocker = async () => {
+    setLoading(true);
     if (passkey.length >= 5 && passkey === confirmPasskey) {
       post({
         url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/locker`,
         cred: true,
       });
+      setLoading(false);
       redirect(`/locker/${lockerName}`);
     }
   };
@@ -133,7 +137,17 @@ export default function Home() {
             className="py-4 px-8 bg-black text-white outline-none hover:bg-grey transition-all rounded-lg max-[602px]:px-5"
             onClick={checkLocker}
           >
-            Let&apos;s Go
+            {loading ? (
+              <Image
+                className="h-5 w-auto animate-spin"
+                src="/assets/loading-light.svg"
+                height={10}
+                width={10}
+                alt="Loading"
+              />
+            ) : (
+              "Let's Go"
+            )}
           </button>
         </span>
         {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -192,7 +206,17 @@ export default function Home() {
               className="py-4 px-4 bg-black text-white outline-none hover:bg-grey transition-all w-[90%] rounded-lg"
               onClick={createLocker}
             >
-              Create
+              {loading ? (
+                <Image
+                  className="h-5 w-auto animate-spin"
+                  src="/assets/loading-light.svg"
+                  height={10}
+                  width={10}
+                  alt="Loading"
+                />
+              ) : (
+                "Create"
+              )}
             </button>
           </div>
         </div>
