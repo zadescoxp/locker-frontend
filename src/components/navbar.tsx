@@ -6,7 +6,7 @@ export default function Navbar() {
     <div className="w-full flex justify-between items-center py-6 px-10">
       <Link href="/">
         <Image
-          className="h-7 w-auto"
+          className="h-7 w-auto max-[602px]:h-4"
           src="assets/VOUZ.svg"
           height={100}
           width={500}
@@ -16,7 +16,7 @@ export default function Navbar() {
 
       <Link href="https://github.com/zadescoxp/locker-frontend" target="_blank">
         <Image
-          className="h-6 w-auto"
+          className="h-6 w-auto max-[602px]:h-5"
           src="assets/github.svg"
           height={100}
           width={500}

@@ -4,9 +4,9 @@ export default function Feature() {
   return (
     <div className="flex flex-col items-center justify-start px-5 gap-5 w-screen pb-40">
       <h1 className="text-3xl">Features</h1>
-      <div className="flex items-center justify-between gap-x-10 w-[80%] bg-lightgrey">
+      <div className="flex items-center justify-between gap-x-10 w-[80%] bg-lightgrey rounded-lg">
         <div className="w-1/2 flex items-center justify-center">
-          <ol className="flex flex-col gap-5 items-start justify-center text-xl px-5">
+          <ol className="flex flex-col gap-5 items-start justify-center text-2xl px-5">
             <li>
               <h1>No Login Required 🚫</h1>
               <p className="text-sm font-light">
