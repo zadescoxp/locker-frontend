@@ -206,8 +206,16 @@ export default function Home() {
               </p>
             </span>
             <button
-              className="py-4 px-4 bg-black text-white outline-none hover:bg-grey transition-all w-[90%] rounded-lg flex items-center justify-center"
-              onClick={createLocker}
+              className={`py-4 px-4 ${
+                passkey.length >= 5 && passkey === confirmPasskey
+                  ? "bg-black"
+                  : "bg-grey"
+              } text-white outline-none hover:bg-grey transition-all w-[90%] rounded-lg flex items-center justify-center`}
+              onClick={() => {
+                if (passkey.length >= 5 && passkey === confirmPasskey) {
+                  createLocker();
+                }
+              }}
             >
               {loading ? (
                 <Image
