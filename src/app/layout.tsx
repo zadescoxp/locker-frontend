@@ -58,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${helvetica.variable} antialiased helvetica`}>
-        <Toaster position="bottom-left" richColors />
+        <Toaster position="bottom-left" richColors closeButton />
         {children}
       </body>
     </html>
