@@ -22,8 +22,11 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   const [exists, setExists] = useState<boolean>(false);
   const [image, setImage] = useState<FormData>(new FormData());
   const [loading, setLoading] = useState<boolean>(false);
+  const [pageLoading, setPageLoading] = useState<boolean>(true);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    setPageLoading(true);
     const loadId = async () => {
       const resolvedId = (await props.params).id;
       setId(resolvedId);
@@ -44,12 +47,16 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     );
     if (response.success) {
       if ((response.data as { status: number }).status === 1) {
+        setPageLoading(false);
         setExists(true);
       }
+    } else {
+      setPageLoading(false);
     }
   };
 
   const check_key = async () => {
+    setPageLoading(true);
     const payload = {
       name: id,
       key: passkey,
@@ -68,13 +75,16 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
         setAuth(true);
         setName(responseData.name);
         setData(responseData.data);
+        setPageLoading(false);
       }
     } else {
       console.log(response.error);
+      setPageLoading(false);
     }
   };
 
   const delete_locker = async () => {
+    setDeleteLoading(true);
     const payload = {
       name: id,
       passkey: passkey,
@@ -85,65 +95,10 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     );
     if (response.success) {
       if ((response.data as { status: number }).status === 1) {
+        setDeleteLoading(false);
         redirect("/");
       } else {
-        console.log(response.error);
-      }
-    }
-  };
-
-  if (!exists) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-5">
-          <h1 className="text-3xl">Locker not found</h1>
-          <button
-            className="bg-black text-white font-light py-4 px-8 rounded-lg"
-            onClick={() => redirect("/")}
-          >
-            Go back
-          </button>
-        </div>
-      </div>
-    );
-  }
-  if (!auth) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center">
-        <div className="flex flex-col items-center bg-lightgrey rounded-lg p-10 gap-5 w-1/3">
-          <h1 className="text-3xl">Enter passkey</h1>
-          <input
-            type="password"
-            className="py-4 px-4 bg-white rounded-lg outline-none w-full font-light"
-            placeholder="Enter your passkey"
-            value={passkey}
-            onChange={(e) => setPasskey(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && check_key()}
-          />
-          <button
-            className="bg-black text-white font-light py-4 px-8 rounded-lg w-full"
-            onClick={check_key}
-          >
-            Submit
-          </button>
-        </div>
-      </div>
-    );
-  }
-  const deleteFile = async (fileName: string) => {
-    const payload = {
-      name: id,
-      passkey: passkey,
-      fileName: fileName,
-    };
-    const response = await api.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete_file`,
-      encryptObjectValues(payload)
-    );
-    if (response.success) {
-      if ((response.data as { status: number }).status === 1) {
-        check_key();
-      } else {
+        setDeleteLoading(false);
         console.log(response.error);
       }
     }
@@ -174,14 +129,92 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     }
   };
 
+  const deleteFile = async (fileName: string) => {
+    setDeleteLoading(true);
+    const payload = {
+      name: id,
+      passkey: passkey,
+      fileName: fileName,
+    };
+    const response = await api.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete_file`,
+      encryptObjectValues(payload)
+    );
+    if (response.success) {
+      if ((response.data as { status: number }).status === 1) {
+        setDeleteLoading(false);
+        check_key();
+      } else {
+        console.log(response.error);
+        setDeleteLoading(false);
+      }
+    }
+  };
+
+  if (pageLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <Image
+          src="/assets/loading.svg"
+          alt="loading"
+          width={50}
+          height={50}
+          className="animate-spin"
+        />
+      </div>
+    );
+  }
+
+  if (!exists) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-5">
+          <h1 className="text-3xl">Locker not found</h1>
+          <button
+            className="bg-black text-white font-light py-4 px-8 rounded-lg"
+            onClick={() => redirect("/")}
+          >
+            Go back
+          </button>
+        </div>
+      </div>
+    );
+  }
+  if (!auth) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <div className="flex flex-col items-center bg-lightgrey rounded-lg p-10 gap-5 w-1/3 max-[602px]:w-[90%]">
+          <h1 className="text-3xl">Enter passkey</h1>
+          <input
+            type="password"
+            className="py-4 px-4 bg-white rounded-lg outline-none w-full font-light"
+            placeholder="Enter your passkey"
+            value={passkey}
+            onChange={(e) => setPasskey(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && check_key()}
+          />
+          <button
+            className="bg-black text-white font-light py-4 px-8 rounded-lg w-full"
+            onClick={check_key}
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const DeleteLocker = () => {
     return (
       <div className="w-screen h-screen bg-black bg-opacity-50 fixed top-0 left-0 flex items-center justify-center">
         <div className="bg-white p-10 rounded-lg flex flex-col gap-5">
           <p className="text-xl">Sure you want to delete it ?</p>
           <span className="flex gap-10 font-light">
-            <button className="text-red-500" onClick={delete_locker}>
-              Delete
+            <button
+              className={`${deleteLoading ? "text-red-400" : "text-red-500"}`}
+              onClick={delete_locker}
+            >
+              {deleteLoading ? "Deleting..." : "Delete"}
             </button>
             <button className="" onClick={() => setDeleteLocker(!deleteLocker)}>
               Cancel
@@ -194,7 +227,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="flex items-center justify-center flex-col gap-5">
-      <div className="flex flex-col items-center gap-5 w-1/2 my-20">
+      <div className="flex flex-col items-center gap-5 w-full px-5 my-20">
         <div className="flex items-center justify-between w-full">
           <h1 className="text-3xl">{name}</h1>
 
@@ -207,30 +240,46 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="flex flex-col items-start justify-center border-2 border-black rounded-lg w-full">
-          <p className="text-2xl p-5">Files</p>
+          <p className="text-2xl p-5">
+            {data.length} {data.length < 2 ? "file" : "files"}
+          </p>
           {data.length > 0 &&
             data.map((item, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between gap-2 border-t-2 p-4 w-full border-grey"
               >
-                <span className="flex gap-2 text-grey">
+                <span className="flex gap-2 text-grey w-[80%]">
                   <Image
                     src="/assets/file.svg"
                     alt="file"
                     width={15}
                     height={15}
                   />
-                  {item?.fileName}
+                  <p className="text-wrap">
+                    {item?.fileName.length > 10
+                      ? `${item?.fileName.substring(0, 10)}...`
+                      : item?.fileName}
+                  </p>
                 </span>
                 <span className="flex gap-2">
                   <button onClick={() => deleteFile(item?.fileName)}>
-                    <Image
-                      src="/assets/delete.svg"
-                      alt="delete"
-                      width={15}
-                      height={15}
-                    />
+                    {deleteLoading ? (
+                      <Image
+                        className="animate-spin"
+                        src="/assets/loading.svg"
+                        alt="deleting"
+                        width={15}
+                        height={15}
+                      />
+                    ) : (
+                      <Image
+                        src="/assets/delete.svg"
+                        alt="delete"
+                        width={15}
+                        height={15}
+                      />
+                    )}
                   </button>
                   <Link
                     href={item?.url}
@@ -279,7 +328,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
                 onChange={(e) => {
                   addFiles(e);
                 }}
-                accept="image/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+                accept=".png,.svg,.jpg,.ico,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
               />
             </label>
             {image.get("file") ? (

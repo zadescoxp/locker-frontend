@@ -32,7 +32,6 @@ export default function Home() {
       response = await api.post(url, encryptObjectValues({ name: lockerName }));
     }
     if (response?.success) {
-      setLoading(false);
       const data = response.data as {
         error?: string;
         message?: string;
@@ -40,17 +39,21 @@ export default function Home() {
       };
 
       if (data.status === 2) {
-        setLoading(false);
         redirect(`/locker/${lockerName}`);
       }
 
       if (data.error) {
         setError(data.error);
+        setLoading(false);
       } else if (data.message) {
         setMessage(data.message);
+        setLoading(false);
       } else {
         setError("Something went wrong");
+        setLoading(false);
       }
+
+      setLoading(false);
     }
   };
 
@@ -139,7 +142,7 @@ export default function Home() {
           >
             {loading ? (
               <Image
-                className="h-5 w-auto animate-spin"
+                className="h-5 w-auto animate-spin max-[602px]:h-3"
                 src="/assets/loading-light.svg"
                 height={10}
                 width={10}
@@ -159,7 +162,7 @@ export default function Home() {
 
       {message && (
         <div className="h-screen w-screen flex items-center justify-center bg-[rgba(0,0,0,0.75)] fixed z-20 top-0 left-0">
-          <div className="relative bg-white w-1/3 py-14 rounded-lg flex flex-col gap-5 items-center justify-center">
+          <div className="relative bg-white w-1/3 max-[602px]:w-[96%] py-14 rounded-lg flex flex-col gap-5 items-center justify-center">
             <button
               className="absolute top-6 right-9"
               onClick={() => setMessage("")}
@@ -203,12 +206,12 @@ export default function Home() {
               </p>
             </span>
             <button
-              className="py-4 px-4 bg-black text-white outline-none hover:bg-grey transition-all w-[90%] rounded-lg"
+              className="py-4 px-4 bg-black text-white outline-none hover:bg-grey transition-all w-[90%] rounded-lg flex items-center justify-center"
               onClick={createLocker}
             >
               {loading ? (
                 <Image
-                  className="h-5 w-auto animate-spin"
+                  className="h-5 w-auto animate-spin max-[602px]:h-3"
                   src="/assets/loading-light.svg"
                   height={10}
                   width={10}
