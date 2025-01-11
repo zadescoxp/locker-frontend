@@ -56,14 +56,20 @@ export default function Home() {
   const checkLocker = async () => {
     setLockerName(lockerName.replaceAll(" ", ""));
     if (lockerName) {
-      post({ url: "http://localhost:5000/api/check", cred: false });
+      post({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/check`,
+        cred: false,
+      });
     }
   };
 
   // create a new locker
   const createLocker = async () => {
     if (passkey.length >= 5 && passkey === confirmPasskey) {
-      post({ url: "http://localhost:5000/api/locker", cred: true });
+      post({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/locker`,
+        cred: true,
+      });
       redirect(`/locker/${lockerName}`);
     }
   };
@@ -71,49 +77,52 @@ export default function Home() {
   return (
     <div className="">
       <Navbar />
-      <div className="flex items-center justify-center flex-col gap-y-5 h-[80vh]">
-        <div className="flex items-center justify-center gap-10 text-5xl">
-          <h1 className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center flex-col gap-y-5 h-[80vh] max-[1165px]:gap-y-3">
+        <div className="flex items-center justify-center gap-10 text-5xl max-[1165px]:text-3xl max-[602px]:text-xl max-[602px]:gap-3">
+          <h1 className="flex items-center justify-center gap-2 max-[602px]:gap-1">
             CREATE{" "}
             <Image
               src="/assets/emoji/pencil.png"
               height={40}
               width={40}
               alt="Pencil"
+              className="max-[1165px]:w-auto max-[1165px]:h-7 max-[602px]:h-5"
             />
           </h1>
 
-          <h1 className="flex items-center justify-center gap-2">
+          <h1 className="flex items-center justify-center gap-2 max-[602px]:gap-1">
             SECURE
             <Image
               src="/assets/emoji/secure.png"
               height={40}
               width={40}
               alt="Lock"
+              className="max-[1165px]:w-auto max-[1165px]:h-7 max-[602px]:h-5"
             />
           </h1>
 
-          <h1 className="flex items-center justify-center gap-2">
+          <h1 className="flex items-center justify-center gap-2 max-[602px]:gap-1">
             SHARE
             <Image
               src="/assets/emoji/share.png"
               height={40}
               width={40}
               alt="Share"
+              className="max-[1165px]:w-auto max-[1165px]:h-7 max-[602px]:h-5"
             />
           </h1>
         </div>
 
-        <h1 className="text-grey font-light text-2xl">
+        <h1 className="text-grey font-light text-2xl max-[1165px]:text-lg max-[602px]:text-sm">
           Open Source File Sharing Platform
         </h1>
 
-        <span className="flex items-center justify-center gap-5 font-light w-1/2">
-          <p>vouz.tech/</p>
+        <span className="flex items-center justify-center gap-5 font-light w-1/2 max-[1165px]:w-[90%] max-[1165px]:text-sm max-[602px]:w-full max-[602px]:gap-2">
+          <p className="max-[602px]:hidden">vouz.tech/</p>
           <input
             type="text"
             placeholder="Enter a name for your locker"
-            className="py-4 px-4 bg-lightgrey outline-none w-[60%] rounded-lg"
+            className="py-4 px-4 bg-lightgrey outline-none w-[60%] rounded-lg max-[602px]:px-5"
             value={lockerName}
             onChange={(e) => {
               setLockerName(e.target.value);
@@ -121,7 +130,7 @@ export default function Home() {
             onKeyDown={(e) => e.key === "Enter" && checkLocker()}
           />
           <button
-            className="py-4 px-8 bg-black text-white outline-none hover:bg-grey transition-all rounded-lg"
+            className="py-4 px-8 bg-black text-white outline-none hover:bg-grey transition-all rounded-lg max-[602px]:px-5"
             onClick={checkLocker}
           >
             Let&apos;s Go
@@ -138,10 +147,15 @@ export default function Home() {
         <div className="h-screen w-screen flex items-center justify-center bg-[rgba(0,0,0,0.75)] fixed z-20 top-0 left-0">
           <div className="relative bg-white w-1/3 py-14 rounded-lg flex flex-col gap-5 items-center justify-center">
             <button
-              className="absolute top-4 right-9"
+              className="absolute top-6 right-9"
               onClick={() => setMessage("")}
             >
-              close
+              <Image
+                src="/assets/close.svg"
+                height={20}
+                width={20}
+                alt="close"
+              />
             </button>
             <h1 className="text-3xl">Passkey</h1>
             <input

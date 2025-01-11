@@ -7,15 +7,21 @@ import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 import { encrypt } from "tanmayo7lock";
 
+interface FileData {
+  fileName: string;
+  url: string;
+}
+
 export default function Locker(props: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState<string>("");
   const [auth, setAuth] = useState<boolean>(false);
   const [passkey, setPasskey] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [data, setData] = useState<string[]>([]);
+  const [data, setData] = useState<FileData[]>([]);
   const [deleteLocker, setDeleteLocker] = useState<boolean>(false);
   const [exists, setExists] = useState<boolean>(false);
   const [image, setImage] = useState<FormData>(new FormData());
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const loadId = async () => {
@@ -33,7 +39,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
 
   const get_locker = async () => {
     const response = await api.post(
-      `http://localhost:5000/api/get/`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/get/`,
       encryptObjectValues({ name: id })
     );
     if (response.success) {
@@ -49,14 +55,14 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       key: passkey,
     };
     const response = await api.post(
-      `http://localhost:5000/api/check_key`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/check_key`,
       encryptObjectValues(payload)
     );
     if (response.success) {
       const responseData = response.data as {
         status: number;
         name: string;
-        data: string[];
+        data: { fileName: string; url: string }[];
       };
       if (responseData.status === 1) {
         setAuth(true);
@@ -74,7 +80,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       passkey: passkey,
     };
     const response = await api.post(
-      "http://localhost:5000/api/delete",
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete`,
       encryptObjectValues(payload)
     );
     if (response.success) {
@@ -124,6 +130,49 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       </div>
     );
   }
+  const deleteFile = async (fileName: string) => {
+    const payload = {
+      name: id,
+      passkey: passkey,
+      fileName: fileName,
+    };
+    const response = await api.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/delete_file`,
+      encryptObjectValues(payload)
+    );
+    if (response.success) {
+      if ((response.data as { status: number }).status === 1) {
+        check_key();
+      } else {
+        console.log(response.error);
+      }
+    }
+  };
+
+  const addFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formData = new FormData();
+    if (e.target.files && e.target.files[0]) {
+      formData.append("file", e.target.files[0], e.target.files[0].name);
+    }
+    formData.append("name", encrypt(id));
+    formData.append("passkey", encrypt(passkey));
+    setImage(formData);
+  };
+
+  const uploadFile = async () => {
+    setLoading(true);
+    const response = await api.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/`,
+      image
+    );
+    if (response.success) {
+      check_key();
+      image.delete("file");
+      setLoading(false);
+    } else {
+      console.log(response.error);
+    }
+  };
 
   const DeleteLocker = () => {
     return (
@@ -143,45 +192,9 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     );
   };
 
-  const deleteFile = async (fileName: string) => {
-    const payload = {
-      name: id,
-      passkey: passkey,
-      fileName: fileName,
-    };
-    const response = await api.post(
-      "http://localhost:5000/api/delete_file",
-      encryptObjectValues(payload)
-    );
-    if (response.success) {
-      if ((response.data as { status: number }).status === 1) {
-        check_key();
-      } else {
-        console.log(response.error);
-      }
-    }
-  };
-
-  const addFiles = async (e) => {
-    const formData = new FormData();
-    formData.append("file", e.target.files[0], e.target.files[0].name);
-    formData.append("name", encrypt(id));
-    formData.append("passkey", encrypt(passkey));
-    setImage(formData);
-  };
-
-  const uploadFile = async () => {
-    const response = await api.post(`http://localhost:5000/api/upload/`, image);
-    if (response.success) {
-      check_key();
-    } else {
-      console.log(response.error);
-    }
-  };
-
   return (
     <div className="flex items-center justify-center flex-col gap-5">
-      <div className="flex flex-col items-center gap-5 w-1/2 mt-40">
+      <div className="flex flex-col items-center gap-5 w-1/2 my-20">
         <div className="flex items-center justify-between w-full">
           <h1 className="text-3xl">{name}</h1>
 
@@ -193,20 +206,15 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
           </button>
         </div>
 
-        <div className="flex flex-col items-start justify-center border-[1px] border-black rounded-lg w-full">
+        <div className="flex flex-col items-start justify-center border-2 border-black rounded-lg w-full">
           <p className="text-2xl p-5">Files</p>
           {data.length > 0 &&
             data.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between gap-2 border-t-[1px] p-4 w-full border-grey"
+                className="flex items-center justify-between gap-2 border-t-2 p-4 w-full border-grey"
               >
-                <Link
-                  href={item?.url}
-                  download={item?.url}
-                  target="_blank"
-                  className="flex gap-2"
-                >
+                <span className="flex gap-2 text-grey">
                   <Image
                     src="/assets/file.svg"
                     alt="file"
@@ -214,7 +222,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
                     height={15}
                   />
                   {item?.fileName}
-                </Link>
+                </span>
                 <span className="flex gap-2">
                   <button onClick={() => deleteFile(item?.fileName)}>
                     <Image
@@ -226,7 +234,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
                   </button>
                   <Link
                     href={item?.url}
-                    download={item?.url}
+                    download={item?.fileName}
                     target="_blank"
                     className="flex gap-2"
                   >
@@ -242,24 +250,62 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
             ))}
         </div>
 
-        {/* <label htmlFor="fileInput">Upload</label> */}
-        <span className="flex gap-5 items-center justify-center w-full">
-          <input
-            className="bg-lightgrey p-4 rounded-lg w-full"
-            id="fileInput"
-            type="file"
-            onChange={(e) => {
-              addFiles(e);
-            }}
-            accept="image/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
-          />
-          <button
-            onClick={uploadFile}
-            className="bg-black text-white py-4 px-8 rounded-lg"
-          >
-            Upload
-          </button>
-        </span>
+        {data.length < 10 ? (
+          <span className="flex flex-col gap-5 items-center justify-center w-full">
+            <label
+              htmlFor="fileInput"
+              className="border-grey border-dashed border-2 w-full rounded-lg relative cursor-pointer p-10"
+            >
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justfiy-center flex-col gap-5">
+                <Image
+                  src="/assets/uploadFile.svg"
+                  height={30}
+                  width={30}
+                  alt="Upload File"
+                  className="h-14 w-auto"
+                />
+                {image.get("file") ? (
+                  <p className="font-light">
+                    {(image.get("file") as File)?.name}
+                  </p>
+                ) : (
+                  <p>Click to upload a file</p>
+                )}
+              </div>
+              <input
+                className="border-2 border-grey border-dashed p-8 rounded-lg w-full z-10 flex items-center justify-center invisible"
+                id="fileInput"
+                type="file"
+                onChange={(e) => {
+                  addFiles(e);
+                }}
+                accept="image/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+              />
+            </label>
+            {image.get("file") ? (
+              <span className="w-full">
+                <button
+                  onClick={() => {
+                    if (!loading) {
+                      uploadFile();
+                    }
+                  }}
+                  className={`${
+                    loading ? "bg-grey cursor-not-allowed" : "bg-black"
+                  } text-white py-4 px-8 rounded-lg hover:bg-grey transition-all w-full`}
+                >
+                  {loading ? "Uploading..." : "Upload"}
+                </button>
+              </span>
+            ) : (
+              <button className="bg-grey text-white py-4 px-8 rounded-lg w-full">
+                Select a file
+              </button>
+            )}
+          </span>
+        ) : (
+          <p className="text-red-500 font-light">Limit reached</p>
+        )}
         {deleteLocker && <DeleteLocker />}
       </div>
     </div>
