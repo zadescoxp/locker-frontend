@@ -183,7 +183,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   if (!auth) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
-        <div className="flex flex-col items-center bg-lightgrey rounded-lg p-10 gap-5 w-1/3 max-[602px]:w-[90%]">
+        <div className="flex flex-col items-center bg-lightgrey rounded-lg p-10 gap-5 w-1/3 max-[602px]:w-[90%] max-[1165px]:w-1/2">
           <h1 className="text-3xl">Enter passkey</h1>
           <input
             type="password"
