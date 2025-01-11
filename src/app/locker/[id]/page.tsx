@@ -130,7 +130,6 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   };
 
   const deleteFile = async (fileName: string) => {
-    setDeleteLoading(true);
     const payload = {
       name: id,
       passkey: passkey,
@@ -142,11 +141,9 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     );
     if (response.success) {
       if ((response.data as { status: number }).status === 1) {
-        setDeleteLoading(false);
         check_key();
       } else {
         console.log(response.error);
-        setDeleteLoading(false);
       }
     }
   };
@@ -227,7 +224,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="flex items-center justify-center flex-col gap-5">
-      <div className="flex flex-col items-center gap-5 w-full px-5 my-20">
+      <div className="flex flex-col items-center gap-5 w-[80%] px-5 my-20 max-[602px]:w-full">
         <div className="flex items-center justify-between w-full">
           <h1 className="text-4xl">{name}</h1>
 
@@ -239,64 +236,60 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
           </button>
         </div>
 
-        <div className="flex flex-col items-start justify-center border-2 border-black rounded-lg w-full">
-          <p className="text-2xl p-5">
+        <div className="flex flex-col items-start justify-center rounded-lg w-full">
+          <p className="text-2xl p-5 pl-0 text-grey">
             {data.length} {data.length < 2 ? "file" : "files"}
           </p>
-          {data.length > 0 &&
-            data.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between gap-2 border-t-2 p-4 w-full border-grey"
-              >
-                <span className="flex gap-2 text-grey w-[80%]">
-                  <Image
-                    src="/assets/file.svg"
-                    alt="file"
-                    width={15}
-                    height={15}
-                  />
-                  <p className="">
-                    {item?.fileName.length > 10
-                      ? `${item?.fileName.substring(0, 10)}...`
-                      : item?.fileName}
-                  </p>
-                </span>
-                <span className="flex gap-2">
-                  <button onClick={() => deleteFile(item?.fileName)}>
-                    {deleteLoading ? (
-                      <Image
-                        className="animate-spin"
-                        src="/assets/loading.svg"
-                        alt="deleting"
-                        width={15}
-                        height={15}
-                      />
-                    ) : (
+          <div className="grid grid-cols-3 gap-5 w-full max-[812px]:grid-cols-1 max-[1165px]:grid-cols-2">
+            {data.length > 0 &&
+              data.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between gap-2 p-4 w-full bg-lightgrey rounded-lg hover:shadow-md transition-all"
+                >
+                  <span className="flex gap-2 w-[80%]">
+                    <Image
+                      src="/assets/file.svg"
+                      alt="file"
+                      width={15}
+                      height={15}
+                    />
+                    <p className="">
+                      {item?.fileName.length > 10
+                        ? `${item?.fileName.substring(0, 12)}...`
+                        : item?.fileName}
+                    </p>
+                  </span>
+                  <span className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        deleteFile(item?.fileName);
+                      }}
+                    >
                       <Image
                         src="/assets/delete.svg"
                         alt="delete"
                         width={15}
                         height={15}
                       />
-                    )}
-                  </button>
-                  <Link
-                    href={item?.url}
-                    download={item?.fileName}
-                    target="_blank"
-                    className="flex gap-2"
-                  >
-                    <Image
-                      src="/assets/download.svg"
-                      alt="file"
-                      width={15}
-                      height={15}
-                    />
-                  </Link>
-                </span>
-              </div>
-            ))}
+                    </button>
+                    <Link
+                      href={item?.url}
+                      download={item?.fileName}
+                      target="_blank"
+                      className="flex gap-2"
+                    >
+                      <Image
+                        src="/assets/download.svg"
+                        alt="file"
+                        width={15}
+                        height={15}
+                      />
+                    </Link>
+                  </span>
+                </div>
+              ))}
+          </div>
         </div>
 
         {data.length < 10 ? (
