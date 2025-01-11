@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vouz Frontend
+
+Welcome to the frontend repository of **Vouz**, an open-source, no-login, fully encrypted file-sharing platform. This project allows users to create secure lockers for file storage and sharing without the need for user accounts. For backend implementation details, visit the [Vouz Backend Repository](https://github.com/zadescoxp/locker-backend).
+
+## Features
+
+- **No Login Required**: Share files effortlessly without creating an account.
+- **Secure Lockers**: Protect your files with unique passkeys.
+- **Easy Sharing**: Share locker names and passkeys to grant access.
+- **Open Source**: Contribute to the project and help improve it.
+
+## Demo
+
+Explore the live application at [vouz.tech](https://vouz.tech).
 
 ## Getting Started
 
-First, run the development server:
+To set up the project locally, follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Clone the Repository**:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   git clone https://github.com/zadescoxp/locker-frontend.git
+   cd locker-frontend
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Install Dependencies**:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. **Configure Environment Variables**:
 
-To learn more about Next.js, take a look at the following resources:
+   Create a `.env.local` file in the root directory with the following variables:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```env
+   LOCK_SECRET=your_lock_secret
+   NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   - `LOCK_SECRET`: Replace `your_lock_secret` with a secure secret key for encryption.
+   - `NEXT_PUBLIC_BACKEND_URL`: Set this to the URL where your backend server is running.
 
-## Deploy on Vercel
+   > **Note**: Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. Ensure that no sensitive information is included in these variables. 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Run the Development Server**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
+
+## Contributing
+
+We welcome contributions! To get started:
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature-branch-name`.
+3. Make your changes.
+4. Commit your changes: `git commit -m 'Add new feature'`.
+5. Push to the branch: `git push origin feature-branch-name`.
+6. Open a pull request.
+
+Please ensure your code adheres to our coding standards and includes appropriate tests.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For questions or suggestions, please open an issue in this repository.
+
+---
+
+Thank you for contributing to Vouz! 
