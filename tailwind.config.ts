@@ -13,7 +13,7 @@ export default {
         foreground: "var(--foreground)",
         white: "#ffffff",
         grey: "#535353",
-        lightgrey: "#EFEFEF",
+        lightgrey: "#F6F6F6",
       },
     },
   },
