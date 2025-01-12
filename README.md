@@ -12,6 +12,7 @@ Welcome to the frontend repository of **Vouz**, an open-source, no-login, fully 
 ## Demo
 
 Explore the live application at [vouz.tech](https://vouz.tech).
+Take a look at the features on [YouTube](https://youtu.be/vPx3gnUQ1K8)
 
 ## Getting Started
 
