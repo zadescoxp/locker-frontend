@@ -368,7 +368,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
                   <div className="w-full mt-2">
                     <div className="bg-gray-200 w-full h-3 rounded-3xl">
                       <div
-                        className="bg-black h-2 rounded-3xl"
+                        className="bg-black h-3 rounded-3xl"
                         style={{ width: `${uploadProgress}%` }}
                       />
                     </div>
