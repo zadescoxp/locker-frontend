@@ -4,6 +4,8 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Metrics from "@/components/metrics"
+
 
 export const metadata: Metadata = {
   title: "VOUZ",
@@ -65,6 +67,7 @@ export default function RootLayout({
       <body className={`${helvetica.variable} antialiased helvetica`}>
         <Analytics />
         <SpeedInsights />
+        <Metrics/>
         <Toaster position="bottom-left" richColors closeButton />
         {children}
       </body>
