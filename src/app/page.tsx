@@ -153,6 +153,16 @@ export default function Home() {
             )}
           </button>
         </span>
+        <span>
+          Trusted by :{" "}
+          <a
+            href="https://getvibe.in/"
+            className=" text-purple-700 hover:underline hover:underline-offset-2"
+            target="_blank"
+          >
+            getvibe.in
+          </a>{" "}
+        </span>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         {message && <p className="text-green-500 text-sm">{message}</p>}
       </div>
