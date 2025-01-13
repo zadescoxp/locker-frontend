@@ -132,14 +132,14 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
       }
     };
     // Send the form data
-    xhr.onload = () => {
+    xhr.onload = async () => {
       const response = JSON.parse(xhr.responseText);
       if (xhr.status !== 200) {
         toast.error(response.message);
         setLoading(false);
         setUploadProgress(0);
       } else {
-        check_key();
+        await check_key();
         image.delete("file");
         setLoading(false);
         setUploadProgress(0);
