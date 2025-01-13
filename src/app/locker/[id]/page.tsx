@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { encrypt } from "tanmayo7lock";
 
 interface FileData {
@@ -132,19 +133,22 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
     };
     // Send the form data
     xhr.onload = () => {
-      if (xhr.status === 200) {
-        const response = JSON.parse(xhr.responseText);
-        if (!response.success) {
-          console.log(response.error);
-        }
+      const response = JSON.parse(xhr.responseText);
+      if (xhr.status !== 200) {
+        toast.error(response.message);
+        setLoading(false);
+        setUploadProgress(0);
+      } else {
+        check_key();
+        image.delete("file");
+        setLoading(false);
+        setUploadProgress(0);
       }
-      check_key();
-      image.delete("file");
-      setLoading(false);
     };
 
     xhr.onerror = () => {
       setLoading(false);
+      setUploadProgress(0);
       console.log("Upload failed");
     };
 
