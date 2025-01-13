@@ -24,6 +24,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
   const [loading, setLoading] = useState<boolean>(false);
   const [pageLoading, setPageLoading] = useState<boolean>(true);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
     setPageLoading(true);
@@ -116,17 +117,38 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
 
   const uploadFile = async () => {
     setLoading(true);
-    const response = await api.post(
+    const xhr = new XMLHttpRequest();
+
+    xhr.open(
+      "POST",
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/`,
-      image
+      true
     );
-    if (response.success) {
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = (event.loaded / event.total) * 100;
+        setUploadProgress(percentComplete);
+      }
+    };
+    // Send the form data
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        if (!response.success) {
+          console.log(response.error);
+        }
+      }
       check_key();
       image.delete("file");
       setLoading(false);
-    } else {
-      console.log(response.error);
-    }
+    };
+
+    xhr.onerror = () => {
+      setLoading(false);
+      console.log("Upload failed");
+    };
+
+    xhr.send(image);
   };
 
   const deleteFile = async (fileName: string) => {
@@ -298,7 +320,7 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
               htmlFor="fileInput"
               className="border-grey border-dashed border-2 w-full rounded-lg relative cursor-pointer p-10"
             >
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justfiy-center flex-col gap-5">
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center flex-col gap-5">
                 <Image
                   src="/assets/uploadFile.svg"
                   height={30}
@@ -338,6 +360,16 @@ export default function Locker(props: { params: Promise<{ id: string }> }) {
                 >
                   {loading ? "Uploading..." : "Upload"}
                 </button>
+                {loading && (
+                  <div className="w-full mt-2">
+                    <div className="bg-gray-200 w-full h-3 rounded-3xl">
+                      <div
+                        className="bg-black h-2 rounded-3xl"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
               </span>
             ) : (
               <button className="bg-grey text-white py-4 px-8 rounded-lg w-full">
