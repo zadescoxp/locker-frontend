@@ -125,7 +125,7 @@ export default function Home() {
         </h1>
 
         <span className="flex items-center justify-center gap-5 font-light w-1/2 max-[1165px]:w-[90%] max-[1165px]:text-sm max-[602px]:w-full max-[602px]:gap-2">
-          <p className="max-[602px]:hidden">vouz.tech/</p>
+          <p className="max-[602px]:hidden">vouz.tech/locker/</p>
           <input
             type="text"
             placeholder="Enter a name for your locker"
