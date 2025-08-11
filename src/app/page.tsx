@@ -85,6 +85,18 @@ export default function Home() {
     <div className="">
       <Navbar />
       <div className="flex items-center justify-center flex-col gap-y-5 h-[80vh] max-[1165px]:gap-y-3">
+        <div className="bg-red-600 w-1/2 p-4 mb-20 rounded-lg flex items-center justify-center text-white text-sm font-light max-[1165px]:w-[90%] max-[602px]:w-full max-[602px]:text-sm">
+          <p>
+            <b className="text-lg">Dear Users,</b>
+            <br />
+            We&apos;re introducing a new and improved system to help you manage
+            your files more securely and efficiently. As part of this upgrade,
+            the site is currently undergoing maintenance, and all existing data
+            will be removed. We strongly recommend backing up your files before
+            continuing. We apologize for any inconvenience and appreciate your
+            understanding.
+          </p>
+        </div>
         <div className="flex items-center justify-center gap-10 text-5xl max-[1165px]:text-3xl max-[602px]:text-xl max-[602px]:gap-3">
           <h1 className="flex items-center justify-center gap-2 max-[602px]:gap-1">
             CREATE{" "}
